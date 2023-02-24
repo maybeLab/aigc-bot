@@ -1,0 +1,40 @@
+.settingDialog {
+    width: 100vw;
+    position: fixed;
+    top: 40px;
+    background-color: #fff;
+    padding: 20px 10px;
+    box-sizing: border-box;
+    .label {
+        text-align: left;
+        padding: 5px;
+    }
+    .form {
+        display: flex;
+        .simulateIpt {
+            height: 30px;
+            flex: 1;
+            border: 1px solid pink;
+            border-radius: 10px;
+            padding: 2px 8px;
+        }
+        .btnBotSend {
+            height: 40px;
+            line-height: 40px;
+            padding: 0 8px;
+            background-color: pink;
+            color: black;
+            margin-left: 6px;
+            border-radius: 10px;
+        }
+    }
+}
+
+.globalSetting {
+    text-align: left;
+    padding: 8px 12px;
+    margin-bottom: 10px;
+    label {
+        white-space: nowrap;
+    }
+}

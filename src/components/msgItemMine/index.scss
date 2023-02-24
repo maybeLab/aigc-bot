@@ -1,0 +1,27 @@
+.msgItemMine {
+    display: flex;
+    justify-content: flex-end;
+    padding: 15px 0;
+    .wrapper {
+        max-width: 90vw;
+        display: flex;
+        .avatar {
+            margin: 0 10px;
+            img {
+                width: 30px;
+                height: 30px;
+                border-radius: 100%;
+            }
+        }
+        .msg {
+            background-color: green;
+            border-radius: 10px;
+            padding: 8px;
+            word-break: break-all;
+            text-align: left;
+            >pre {
+                font-family: "宋体";
+            }
+        }
+    }
+}
