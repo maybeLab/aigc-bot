@@ -1,8 +1,8 @@
-import { memo, useState, useEffect, useCallback, ChangeEvent } from "react";
+import { memo, useState, useEffect } from "react";
 import { VoiceInfo } from "microsoft-cognitiveservices-speech-sdk";
-import { getSpeechConfig, getSpeakers } from "../../utils/speech";
+import { getSpeakers } from "../../utils/speech";
 
-export default memo(function () {
+export default memo(function Settings() {
   const [locale, setLocale] = useState("en-US");
   const [speaker, setSpeaker] = useState(-1);
   const [speakerStyle, setSpeakerStyle] = useState("");
