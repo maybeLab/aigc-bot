@@ -1,21 +1,20 @@
 import * as React from "react";
+import { Outlet } from "react-router-dom";
+
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import CssBaseline from "@mui/material/CssBaseline";
-import Divider from "@mui/material/Divider";
 import Drawer from "@mui/material/Drawer";
 import IconButton from "@mui/material/IconButton";
 import SettingsIcon from "@mui/icons-material/Settings";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemText from "@mui/material/ListItemText";
+
 import MenuIcon from "@mui/icons-material/Menu";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 
-import Chat from "@/components/chat";
 import Settings from "@/components/settings";
+import Conversations from "@/components/conversations";
+import { API_GET_CONVERSATIONS, IConversation } from "@/fetch/api";
 
 const drawerWidth = 240;
 
@@ -32,6 +31,17 @@ export default function App(props: Props) {
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [settingOpen, setSettingOpen] = React.useState(false);
 
+  const [list, setList] = React.useState([] as IConversation[]);
+  React.useEffect(() => {
+    API_GET_CONVERSATIONS().then((list) => {
+      setList(list);
+    });
+  }, []);
+
+  const onAddRobot = React.useCallback((data: IConversation) => {
+    setList((prev) => [...prev, data]);
+  }, []);
+
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
@@ -39,27 +49,11 @@ export default function App(props: Props) {
     setSettingOpen(!settingOpen);
   };
 
-  const drawer = (
-    <div>
-      <Toolbar />
-      <Divider />
-      <List>
-        {["Bot", "Bot", "Bot", "Bot"].map((text, index) => (
-          <ListItem key={index} disablePadding>
-            <ListItemButton>
-              <ListItemText primary={text + index} />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
-    </div>
-  );
-
   const container =
     window !== undefined ? () => window().document.body : undefined;
 
   return (
-    <Box sx={{ display: "flex",height:'100%' }}>
+    <Box sx={{ display: "flex", height: "100%" }}>
       <CssBaseline />
       <AppBar
         position="fixed"
@@ -113,7 +107,7 @@ export default function App(props: Props) {
             },
           }}
         >
-          {drawer}
+          <Conversations list={list} onAdd={onAddRobot} />
         </Drawer>
         <Drawer
           variant="permanent"
@@ -126,7 +120,7 @@ export default function App(props: Props) {
           }}
           open
         >
-          {drawer}
+          <Conversations list={list} onAdd={onAddRobot} />
         </Drawer>
         <Drawer
           open={settingOpen}
@@ -145,8 +139,7 @@ export default function App(props: Props) {
           marginTop: 7,
         }}
       >
-        {/* <Toolbar /> */}
-        <Chat />
+        <Outlet />
       </Box>
     </Box>
   );

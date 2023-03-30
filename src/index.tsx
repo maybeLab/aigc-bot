@@ -1,14 +1,17 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+
 import BrowserLogger from "alife-logger";
 import ProjectInfo from "../package.json";
 import "./index.css";
 import App from "./App";
+import Chat from "@/components/chat";
 import reportWebVitals from "./reportWebVitals";
-import { MsgListProvider } from "./context/messageList";
-import { API_CREATE_USER } from "./fetch/api";
+import { getUserId } from "./fetch/api";
+import { SnackbarProvider } from "notistack";
 
-const uid = await API_CREATE_USER().catch((res) => alert(res.message));
+const uid = await getUserId().catch((res) => alert(res.message));
 
 BrowserLogger.singleton({
   pid: "hz2jf4nhry@85c18f8c99e84dd",
@@ -25,14 +28,27 @@ BrowserLogger.singleton({
   ),
 });
 
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <App />,
+    children: [
+      {
+        path: "chat/:conversationId",
+        element: <Chat />,
+      },
+    ],
+  },
+]);
+
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
 root.render(
   // <React.StrictMode>
-  <MsgListProvider>
-    <App />
-  </MsgListProvider>
+  <SnackbarProvider>
+    <RouterProvider router={router} />
+  </SnackbarProvider>
   // </React.StrictMode>
 );
 
