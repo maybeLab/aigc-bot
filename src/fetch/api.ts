@@ -7,6 +7,18 @@ const ENDPOINT =
     ? "http://localhost:3000/api/v1"
     : "https://larkbot.company.com/api/v1";
 
+export const API_AZURE_TOKEN = async (region: string) => {
+  return (
+    await fetch(
+      `https://fetoolsout.company.com/office/getAzureSpeechToken?region=${region}`
+    )
+  )
+    .json()
+    .then((res) => {
+      return res.token;
+    });
+};
+
 const getCommonHeaders = () => {
   return new Headers({
     Authorization: userId,
