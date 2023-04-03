@@ -11,6 +11,7 @@ export default memo(function Settings() {
 
   useEffect(() => {
     getSpeakers(locale).then((e) => {
+      if (!e.voices?.length) return;
       setSpeakers(e.voices);
       setSpeaker(0);
       setSpeakerStyle(e.voices[0].styleList[0] || "");
