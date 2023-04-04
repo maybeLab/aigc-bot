@@ -5,10 +5,10 @@ import TextInput from "@/components/textInput";
 
 import showdown from "showdown";
 
-import { askAI, API_ASK_AI } from "@/fetch/api";
-
+import { askAI, API_ASK_AI, getMessages } from "@/fetch/api";
+import { EMessage } from "../msgItem/index";
 import "./index.scss";
-// import MsgItem from "../msgItem";
+import MsgItem from "../msgItem";
 
 enum EMSG_SENDER_ROLE {
   MYSELF = 1,
@@ -32,6 +32,7 @@ function Main() {
   const msgListRef: any = useRef();
 
   const [tip, setTip] = useState<string>("");
+  const [messages, setMessages] = useState<any[]>([]);
 
   const [converter, setConverter] = useState<any>();
   useEffect(() => {
@@ -60,7 +61,15 @@ function Main() {
     //   type: "ADD",
     //   payload: { type: EMSG_SENDER_ROLE.BOT, msg: answer },
     // });
-    API_ASK_AI({ content, conversationId });
+    API_ASK_AI({ content, conversationId }).then(async (res) => {
+      // @ts-ignore
+      for await (const chunk of res.body) {
+        console.log(chunk);
+        
+        // Do something with each 'chunk'
+      }
+      
+    });
     // askAI({ content, conversationId }, (str, done) => {
     // setTip("");
     // answer += str;
@@ -92,13 +101,23 @@ function Main() {
     }, 10);
   };
 
+  React.useEffect(() => {
+    getMessages({
+      conversationId: conversationId as string,
+    }).then((r) => setMessages(r));
+  }, [conversationId]);
+
   return (
     <div className="Container" ref={msgListRef}>
       {conversationId}
       {/* 消息列表 */}
-      {/* {msgList.map((item: any, index: number) => (
-        <MsgItem key={index} {...item}></MsgItem>
-      ))} */}
+      {messages.map((item: any) => (
+        <MsgItem
+          key={item.id}
+          type={EMessage.OWN}
+          content={item.content}
+        ></MsgItem>
+      ))}
 
       {tip && <div className="systemTip">{tip}</div>}
 

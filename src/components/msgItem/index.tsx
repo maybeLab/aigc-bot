@@ -1,13 +1,20 @@
-import MsgItemMine from '../msgItemMine'
-import MsgItemBot from '../msgItemBot'
+import MsgItemMine from "../msgItemMine";
+import MsgItemBot from "../msgItemBot";
 
-function MsgItem(props:any) {
+export enum EMessage {
+  OWN,
+  OTHER,
+}
+
+function MsgItem(props: { type: EMessage; content: string }) {
   return (
     <div>
-      {props.type===1 && <MsgItemMine msg={props.msg}></MsgItemMine>}
-      {props.type===2 && <MsgItemBot {...props}></MsgItemBot>}
+      {props.type === EMessage.OWN && (
+        <MsgItemMine content={props.content}></MsgItemMine>
+      )}
+      {props.type === EMessage.OTHER && <MsgItemBot {...props}></MsgItemBot>}
     </div>
-  )
+  );
 }
 
 export default MsgItem;

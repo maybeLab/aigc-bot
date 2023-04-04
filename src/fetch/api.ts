@@ -30,6 +30,22 @@ export const kvCaches = new KeyvCache({ namespace: "fe-tiya-bot" });
 const USER_ID_KEY = "USER_ID";
 const ONE_YEAR = 365 * 24 * 60 * 60 * 1e3;
 
+export const getMessages = (payload: {
+  conversationId: string;
+  lastMessageId?: string;
+}) =>
+  fetch(`${ENDPOINT}/chat/message?${new URLSearchParams(payload).toString()}`, {
+    method: "GET",
+    headers: getCommonHeaders(),
+  }).then((response) => {
+    if (response.ok) {
+      return response.json();
+    }
+    throw new Error(
+      `${response.url}\n${response.status}: ${response.statusText}`
+    );
+  });
+
 export const API_ASK_AI = (payload: {
   conversationId: string;
   content: string;
@@ -38,7 +54,6 @@ export const API_ASK_AI = (payload: {
     method: "POST",
     headers: getCommonHeaders(),
     body: JSON.stringify(payload),
-    mode: "cors",
   });
 
 export const getUserId = async () => {
@@ -67,7 +82,6 @@ export interface IConversation {
   id: string;
   name: string;
   preset: string;
-  create_at: string;
   update_at: string | null;
 }
 
