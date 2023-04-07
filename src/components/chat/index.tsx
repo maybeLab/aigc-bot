@@ -1,98 +1,123 @@
-import React, { useState, useEffect, useRef, memo, useCallback } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  memo,
+  useCallback,
+  useContext,
+} from "react";
 import { useParams } from "react-router-dom";
+import { useSnackbar } from "notistack";
+import showdown from "showdown";
 
 import TextInput from "@/components/textInput";
 
-import showdown from "showdown";
+import { API_ASK_AI, getMessages } from "@/fetch/api";
+import { formatEventMessage } from "@/utils/message";
 
-import { askAI, API_ASK_AI, getMessages } from "@/fetch/api";
-import { EMessage } from "../msgItem/index";
+import msgListContext, {
+  EModifyType,
+  TMessageRoles,
+  IMsgData,
+} from "@/context/messageList";
+
 import "./index.scss";
 import MsgItem from "../msgItem";
 
-enum EMSG_SENDER_ROLE {
-  MYSELF = 1,
-  BOT = 2,
-}
-
-const tipCont: any = {
-  speak: {
-    "zn-CN": "请对着麦克风说话(中文)",
-    "en-US": "speak english into your microphone...",
-  },
-  waiting: {
-    "zn-CN": "GPT思考中,请稍等",
-    "en-US": "GPT is thinking...",
-  },
-};
-
 function Main() {
   let { conversationId } = useParams();
-
   const msgListRef: any = useRef();
+  const { enqueueSnackbar } = useSnackbar();
+
+  const { messages, dispatch } = useContext(msgListContext);
 
   const [tip, setTip] = useState<string>("");
-  const [messages, setMessages] = useState<any[]>([]);
 
   const [converter, setConverter] = useState<any>();
+
+  useEffect(() => {
+    getMessages({
+      conversationId: conversationId as string,
+    }).then((data) => {
+      dispatch({ type: EModifyType.CLEAR, payload: null });
+      dispatch({ type: EModifyType.MULTI_ADD, payload: data });
+    });
+  }, [conversationId, dispatch]);
+
   useEffect(() => {
     let converter = new showdown.Converter();
     setConverter(converter);
   }, []);
 
-  // const addMessage = useCallback(
-  //   (type: number, msg: string) => {
-  //     dispatch({ type: "ADD", payload: { type, msg } });
-  //     scrollToBottom();
-  //   },
-  //   [dispatch]
-  // );
-
-  const wsSend = useCallback((content: string) => {
-    if (!content || !conversationId) return;
-    // if (data.type === 101) {
-    //   // addMessage(1, data.content);
-    //   let locale: string = window._GLOBAL_SETTINGS.locale;
-    //   let tip: string = tipCont.waiting[locale];
-    //   setTip(tip);
-    // }
-    // let answer = "";
-    // dispatch({
-    //   type: "ADD",
-    //   payload: { type: EMSG_SENDER_ROLE.BOT, msg: answer },
-    // });
-    API_ASK_AI({ content, conversationId }).then(async (res) => {
-      // @ts-ignore
-      for await (const chunk of res.body) {
-        console.log(chunk);
-        
-        // Do something with each 'chunk'
-      }
-      
-    });
-    // askAI({ content, conversationId }, (str, done) => {
-    // setTip("");
-    // answer += str;
-    // let answerHtml = converter.makeHtml(answer);
-    // dispatch({
-    //   type: "UPDATE_THE_LAST",
-    //   payload: {
-    //     type: EMSG_SENDER_ROLE.BOT,
-    //     msg: answerHtml,
-    //     startAutoSpeech: done,
-    //   },
-    // });
-    // scrollToBottom();
-    // });
-  }, []);
+  const wsSend = useCallback(
+    (content: string) => {
+      // if (data.type === 101) {
+      //   // addMessage(1, data.content);
+      //   let locale: string = window._GLOBAL_SETTINGS.locale;
+      //   let tip: string = tipCont.waiting[locale];
+      //   setTip(tip);
+      // }
+      // let answer = "";
+      // dispatch({
+      //   type: "ADD",
+      //   payload: { type: EMSG_SENDER_ROLE.BOT, msg: answer },
+      // });
+      // askAI({ content, conversationId }, (str, done) => {
+      // setTip("");
+      // answer += str;
+      // let answerHtml = converter.makeHtml(answer);
+      // dispatch({
+      //   type: "UPDATE_THE_LAST",
+      //   payload: {
+      //     type: EMSG_SENDER_ROLE.BOT,
+      //     msg: answerHtml,
+      //     startAutoSpeech: done,
+      //   },
+      // });
+      // scrollToBottom();
+      // });
+    },
+    [conversationId]
+  );
 
   // user send msg
   const handleSendMessage = useCallback(
-    (text: string) => {
-      if (!text) return;
-      wsSend(text);
+    (content: string, callback: () => void) => {
+      if (!content || !conversationId) return;
+      API_ASK_AI({ content, conversationId })
+        .then(async (res) => {
+          if (!res.body) {
+            throw new Error("no body");
+          }
+          callback();
+          const reader = res.body.getReader();
+
+          const generator = {
+            [Symbol.asyncIterator]() {
+              return {
+                next() {
+                  return reader.read().catch(() => reader.releaseLock());
+                },
+              };
+            },
+          };
+
+          for await (const msg of generator) {
+            const { index, ...message } = formatEventMessage(
+              String.fromCharCode.apply(null, msg)
+            );
+            if (index === 0) {
+              dispatch({ type: EModifyType.ADD, payload: message });
+            } else {
+              dispatch({ type: EModifyType.UPSERT_CONTENT, payload: message });
+            }
+          }
+        })
+        .catch((err) => {
+          enqueueSnackbar(err.message, { variant: "error" });
+        });
     },
-    [wsSend]
+    [conversationId, dispatch, enqueueSnackbar]
   );
 
   const scrollToBottom = () => {
@@ -101,20 +126,13 @@ function Main() {
     }, 10);
   };
 
-  React.useEffect(() => {
-    getMessages({
-      conversationId: conversationId as string,
-    }).then((r) => setMessages(r));
-  }, [conversationId]);
-
   return (
     <div className="Container" ref={msgListRef}>
-      {conversationId}
       {/* 消息列表 */}
-      {messages.map((item: any) => (
+      {messages.map((item: IMsgData) => (
         <MsgItem
           key={item.id}
-          type={EMessage.OWN}
+          type={item.role}
           content={item.content}
         ></MsgItem>
       ))}

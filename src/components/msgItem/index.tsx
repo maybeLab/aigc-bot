@@ -1,18 +1,16 @@
+import { TMessageRoles } from "@/context/messageList";
+
 import MsgItemMine from "../msgItemMine";
 import MsgItemBot from "../msgItemBot";
 
-export enum EMessage {
-  OWN,
-  OTHER,
-}
-
-function MsgItem(props: { type: EMessage; content: string }) {
+function MsgItem(props: { type: TMessageRoles; content: string }) {
   return (
     <div>
-      {props.type === EMessage.OWN && (
+      {props.type === "user" ? (
         <MsgItemMine content={props.content}></MsgItemMine>
+      ) : (
+        <MsgItemBot {...props}></MsgItemBot>
       )}
-      {props.type === EMessage.OTHER && <MsgItemBot {...props}></MsgItemBot>}
     </div>
   );
 }

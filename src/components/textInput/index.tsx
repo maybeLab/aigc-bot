@@ -69,6 +69,10 @@ export default React.memo(function TextInput({ handleSendMessage }: any) {
     blur && (inputAreaRef.current as HTMLDivElement).blur();
   }, []);
 
+  const handleSubmit = React.useCallback(() => {
+    handleSendMessage(text, clearInputArea.bind(null, true));
+  }, [clearInputArea, handleSendMessage, text]);
+
   const onPaste = React.useCallback((event: React.ClipboardEvent) => {
     event.preventDefault();
     let pasteText = event.clipboardData?.getData("text").trim();
@@ -82,11 +86,11 @@ export default React.memo(function TextInput({ handleSendMessage }: any) {
         if (event.shiftKey || event.ctrlKey || event.metaKey) {
           document.execCommand("insertText", false, "\n");
         } else {
-          handleSendMessage();
+          handleSubmit();
         }
       }
     },
-    [handleSendMessage]
+    [handleSubmit]
   );
 
   React.useEffect(() => {
@@ -143,10 +147,7 @@ export default React.memo(function TextInput({ handleSendMessage }: any) {
         <Button
           variant="contained"
           endIcon={<SendIcon />}
-          onClick={() => {
-            clearInputArea();
-            handleSendMessage(text);
-          }}
+          onClick={handleSubmit}
           size="small"
         >
           Send

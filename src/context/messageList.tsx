@@ -1,36 +1,71 @@
 import { ReactElement, createContext, useReducer } from "react";
-import type { Dispatch } from 'react';
+import type { Dispatch } from "react";
 
-interface IMsgData { type: number, msg: string, startAutoSpeech?: boolean };
-type TModifyType = 'UPDATE_THE_LAST' | 'ADD';
+export type TMessageRoles = "system" | "user" | "assistant";
+
+export interface IMsgData {
+  id: string;
+  conversation_id: string;
+  content: string;
+  role: TMessageRoles;
+}
+
+export enum EModifyType {
+  UPSERT_CONTENT,
+  UPDATE_THE_LAST,
+  ADD,
+  MULTI_ADD,
+  CLEAR,
+}
 
 export const msgListContext = createContext<{
-  msgList: IMsgData[],
-  dispatch: Dispatch<{ type: TModifyType, payload: IMsgData }>
+  messages: IMsgData[];
+  dispatch: Dispatch<{
+    type: EModifyType;
+    payload: IMsgData | null | undefined;
+  }>;
 }>({
-  msgList: [],
-  dispatch: () => {}
+  messages: [],
+  dispatch: () => {},
 });
 
-const reducer = (state: Array<IMsgData>, action: { type: TModifyType, payload: IMsgData }) => {
+const reducer = (
+  state: Array<IMsgData>,
+  action: { type: EModifyType; payload: IMsgData }
+) => {
   switch (action.type) {
-    case 'ADD':
-      return [...state, action.payload];
-    case 'UPDATE_THE_LAST':
-      return state.map((val, i) => (i === state.length - 1 ? action.payload : val));
+    case EModifyType.MULTI_ADD:
+      return state.concat(action.payload);
+    case EModifyType.ADD:
+      return state.concat([action.payload]);
+    case EModifyType.CLEAR:
+      return [];
+    case EModifyType.UPSERT_CONTENT:
+      // TODO: findIndexLast
+      const index = state.findIndex((e) => e.id === action.payload.id);
+      if (index === -1) {
+        return [...state, action.payload];
+      } else {
+        return state.map((val, i) => (i === index ? action.payload : val));
+      }
+    case EModifyType.UPDATE_THE_LAST:
+      return state.map((val, i) =>
+        i === state.length - 1 ? action.payload : val
+      );
     default:
       return state;
   }
-}
+};
 
 export const MsgListProvider = ({ children }: { children: ReactElement }) => {
-  const [msgList, dispatch] = useReducer(reducer, [])
+  const [messages, dispatch] = useReducer(reducer, []);
 
   return (
-    <msgListContext.Provider value={{ msgList, dispatch }}>
+    // @ts-ignore
+    <msgListContext.Provider value={{ messages, dispatch }}>
       {children}
     </msgListContext.Provider>
-  )
-}
+  );
+};
 
 export default msgListContext;

@@ -19,15 +19,9 @@ import { API_GET_CONVERSATIONS, IConversation } from "@/fetch/api";
 const drawerWidth = 240;
 
 interface Props {
-  /**
-   * Injected by the documentation to work in an iframe.
-   * You won't need it on your project.
-   */
-  window?: () => Window;
 }
 
 export default function App(props: Props) {
-  const { window } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [settingOpen, setSettingOpen] = React.useState(false);
 
@@ -48,9 +42,6 @@ export default function App(props: Props) {
   const handleSettingToggle = () => {
     setSettingOpen(!settingOpen);
   };
-
-  const container =
-    window !== undefined ? () => window().document.body : undefined;
 
   return (
     <Box sx={{ display: "flex", height: "100%" }}>
@@ -92,7 +83,6 @@ export default function App(props: Props) {
       >
         {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
         <Drawer
-          container={container}
           variant="temporary"
           open={mobileOpen}
           onClose={handleDrawerToggle}

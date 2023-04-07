@@ -1,4 +1,4 @@
-import KeyvCache from "keyv-cache";
+import { kvCaches, USER_ID_KEY, ONE_YEAR } from "./caches";
 import { IForm as IConversationForm } from "@/components/conversations/add";
 let userId = "";
 
@@ -26,10 +26,6 @@ const getCommonHeaders = () => {
   });
 };
 
-export const kvCaches = new KeyvCache({ namespace: "fe-tiya-bot" });
-const USER_ID_KEY = "USER_ID";
-const ONE_YEAR = 365 * 24 * 60 * 60 * 1e3;
-
 export const getMessages = (payload: {
   conversationId: string;
   lastMessageId?: string;
@@ -54,7 +50,7 @@ export const API_ASK_AI = (payload: {
     method: "POST",
     headers: getCommonHeaders(),
     body: JSON.stringify(payload),
-  });
+  }).then((res) => (res.ok ? res : Promise.reject(res)));
 
 export const getUserId = async () => {
   if (await kvCaches.has(USER_ID_KEY)) {

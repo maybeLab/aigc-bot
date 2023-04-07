@@ -1,5 +1,5 @@
-import React from "react";
-import { useParams } from "react-router-dom";
+import React, { useContext } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 
 import Divider from "@mui/material/Divider";
 import List from "@mui/material/List";
@@ -12,12 +12,16 @@ import AddIcon from "@mui/icons-material/Add";
 
 import AddDialog from "./add";
 
-import { IConversation } from "@/fetch/api";
+import msgListContext, { EModifyType } from "@/context/messageList";
+
+import { IConversation, getMessages } from "@/fetch/api";
 
 export default React.memo(function Conversations(props: {
   list: IConversation[];
   onAdd: (data: IConversation) => void;
 }) {
+  const { dispatch } = useContext(msgListContext);
+
   let { conversationId } = useParams();
   const [dialogVisible, setDialogStatus] = React.useState(false);
 
@@ -28,6 +32,8 @@ export default React.memo(function Conversations(props: {
     setDialogStatus(false);
   };
 
+  const navgate = useNavigate();
+
   return (
     <>
       <Toolbar />
@@ -36,8 +42,9 @@ export default React.memo(function Conversations(props: {
         {props.list.map((item) => (
           <ListItem key={item.id} disablePadding>
             <ListItemButton
-              href={`/chat/${item.id}`}
               selected={conversationId === item.id}
+              onClick={() => navgate(`/chat/${item.id}`, { replace: true })}
+              title={conversationId}
             >
               <ListItemText primary={item.name} />
             </ListItemButton>

@@ -1,11 +1,12 @@
-import { SpeechConfig, SpeechSynthesizer } from "microsoft-cognitiveservices-speech-sdk";
-import { API_AZURE_TOKEN } from '../fetch/api'
-import { kvCaches } from "@/fetch/api";
+import {
+  SpeechConfig,
+  SpeechSynthesizer,
+  ResultReason,
+} from "microsoft-cognitiveservices-speech-sdk";
+import { API_AZURE_TOKEN } from "../fetch/api";
+import { kvCaches, SPEAKER_KEY, ONE_MONTH } from "@/fetch/caches";
 
 const serviceRegion = "eastus";
-
-const SPEAKER_KEY = "AZURE_SPEAKERS";
-const ONE_MONTH = 30 * 24 * 60 * 60 * 1e3;
 
 export const transformAzureObject: any = (object: any) => {
   if (typeof object !== "object") return object;
@@ -27,7 +28,7 @@ export const transformAzureObject: any = (object: any) => {
 
 export const getSpeechConfig = async () => {
   const token = await API_AZURE_TOKEN(serviceRegion);
-  return SpeechConfig.fromAuthorizationToken(token,serviceRegion)
+  return SpeechConfig.fromAuthorizationToken(token, serviceRegion);
 };
 
 export const getSpeakers = async (locale: string) => {
@@ -36,7 +37,13 @@ export const getSpeakers = async (locale: string) => {
   } else {
     const config = await getSpeechConfig();
     return new SpeechSynthesizer(config).getVoicesAsync(locale).then((res) => {
-      kvCaches.set(SPEAKER_KEY + locale, transformAzureObject(res), ONE_MONTH);
+      if (res.reason === ResultReason.VoicesListRetrieved) {
+        kvCaches.set(
+          SPEAKER_KEY + locale,
+          transformAzureObject(res),
+          ONE_MONTH
+        );
+      }
       return res;
     });
   }
