@@ -114,7 +114,10 @@ function Main() {
           }
         })
         .catch((err) => {
-          enqueueSnackbar(err.message, { variant: "error" });
+          enqueueSnackbar(err.message, {
+            variant: "error",
+            anchorOrigin: { vertical: "top", horizontal: "center" },
+          });
         });
     },
     [conversationId, dispatch, enqueueSnackbar]
