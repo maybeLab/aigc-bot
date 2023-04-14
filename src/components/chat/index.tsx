@@ -6,6 +6,10 @@ import React, {
   useCallback,
   useContext,
 } from "react";
+import Fab from "@mui/material/Fab";
+import BugReportIcon from "@mui/icons-material/BugReport";
+import List from "@mui/material/List";
+
 import { useParams } from "react-router-dom";
 import { useSnackbar } from "notistack";
 import showdown from "showdown";
@@ -15,11 +19,8 @@ import TextInput from "@/components/textInput";
 import { API_ASK_AI, getMessages } from "@/fetch/api";
 import { formatEventMessage } from "@/utils/message";
 
-import msgListContext, {
-  EModifyType,
-  TMessageRoles,
-  IMsgData,
-} from "@/context/messageList";
+import Store from "@/context";
+import { IMsgData, EModifyType } from "@/types";
 
 import "./index.scss";
 import MsgItem from "../msgItem";
@@ -29,7 +30,7 @@ function Main() {
   const msgListRef: any = useRef();
   const { enqueueSnackbar } = useSnackbar();
 
-  const { messages, dispatch } = useContext(msgListContext);
+  const { state, dispatch } = useContext(Store);
 
   const [tip, setTip] = useState<string>("");
 
@@ -39,8 +40,8 @@ function Main() {
     getMessages({
       conversationId: conversationId as string,
     }).then((data) => {
-      dispatch({ type: EModifyType.CLEAR, payload: null });
-      dispatch({ type: EModifyType.MULTI_ADD, payload: data });
+      dispatch({ type: EModifyType.CLEAR_MESSAGE, payload: null });
+      dispatch({ type: EModifyType.MULTI_ADD_MESSAGE, payload: data });
     });
   }, [conversationId, dispatch]);
 
@@ -86,6 +87,7 @@ function Main() {
       if (!content || !conversationId) return;
       API_ASK_AI({ content, conversationId })
         .then(async (res) => {
+          const decoder = new TextDecoder("utf-8");
           if (!res.body) {
             throw new Error("no body");
           }
@@ -103,14 +105,21 @@ function Main() {
           };
 
           for await (const msg of generator) {
-            const { index, ...message } = formatEventMessage(
-              String.fromCharCode.apply(null, msg)
-            );
-            if (index === 0) {
-              dispatch({ type: EModifyType.ADD, payload: message });
-            } else {
-              dispatch({ type: EModifyType.UPSERT_CONTENT, payload: message });
-            }
+            const str = decoder.decode(msg);
+            str
+              .split("\n\n")
+              .filter((line: string) => line.trim() !== "")
+              .forEach((line: string) => {
+                const { index, ...message } = formatEventMessage(line);
+                if (index === 0) {
+                  dispatch({ type: EModifyType.ADD_MESSAGE, payload: message });
+                } else {
+                  dispatch({
+                    type: EModifyType.UPSERT_CONTENT_MESSAGE,
+                    payload: message,
+                  });
+                }
+              });
           }
         })
         .catch((err) => {
@@ -129,21 +138,48 @@ function Main() {
     }, 10);
   };
 
+  const mockSubmit = React.useCallback(() => {
+    handleSendMessage("你好", () => {});
+  }, [handleSendMessage]);
+
   return (
     <div className="Container" ref={msgListRef}>
       {/* 消息列表 */}
-      {messages.map((item: IMsgData) => (
-        <MsgItem
-          key={item.id}
-          type={item.role}
-          content={item.content}
-        ></MsgItem>
-      ))}
+      <List
+        sx={{
+          width: "100%",
+          height: "100%",
+          pb: 7,
+          overflow: "auto",
+          bgcolor: "background.paper",
+        }}
+      >
+        {state.messages.map((item: IMsgData) => (
+          <MsgItem
+            key={item.id}
+            type={item.role}
+            content={item.content}
+          ></MsgItem>
+        ))}
+      </List>
 
       {tip && <div className="systemTip">{tip}</div>}
 
       {/* 信息输入框 */}
       <TextInput handleSendMessage={handleSendMessage} />
+      <Fab
+        aria-label="Microphone"
+        color="primary"
+        onClick={mockSubmit}
+        sx={{
+          position: "absolute",
+          bottom: 100,
+          right: 20,
+          margin: "auto",
+        }}
+      >
+        <BugReportIcon />
+      </Fab>
     </div>
   );
 }

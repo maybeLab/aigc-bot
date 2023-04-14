@@ -1,10 +1,12 @@
 import { kvCaches, USER_ID_KEY, ONE_YEAR } from "./caches";
 import { IForm as IConversationForm } from "@/components/conversations/add";
+import { IConversation } from "@/types";
+
 let userId = "";
 
 const ENDPOINT =
   process.env.NODE_ENV === "development"
-    ? "http://localhost:3000/api/v1"
+    ? `${window.location.protocol}//${window.location.hostname}:3000/api/v1`
     : "https://larkbot.company.com/api/v1";
 
 export const API_AZURE_TOKEN = async (region: string) => {
@@ -73,13 +75,6 @@ export const API_CREATE_USER = async (): Promise<string> =>
       );
     })
     .then((res) => res.id);
-
-export interface IConversation {
-  id: string;
-  name: string;
-  preset: string;
-  update_at: string | null;
-}
 
 export const API_GET_CONVERSATIONS = async (): Promise<IConversation[]> =>
   fetch(`${ENDPOINT}/conversation`, {

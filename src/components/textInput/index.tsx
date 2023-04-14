@@ -8,12 +8,13 @@ import Fab from "@mui/material/Fab";
 import SendIcon from "@mui/icons-material/Send";
 import MicIcon from "@mui/icons-material/Mic";
 import Zoom from "@mui/material/Zoom";
+import Typography from "@mui/material/Typography";
 
 import * as SpeechSDK from "microsoft-cognitiveservices-speech-sdk";
 import { getSpeechConfig } from "@/utils/speech";
 
 export default React.memo(function TextInput({ handleSendMessage }: any) {
-  const inputAreaRef = React.useRef<HTMLDivElement | null>();
+  const inputAreaRef = React.useRef<HTMLSpanElement | null>();
   const [tip, setTip] = React.useState("");
   const [text, setText] = React.useState("");
   const [isFocus, setFocusState] = React.useState(false);
@@ -28,7 +29,6 @@ export default React.memo(function TextInput({ handleSendMessage }: any) {
   const [micState, setMicState] = React.useState(false);
 
   const sttFromMic = React.useCallback(async () => {
-    console.log("sttFromMix", micState);
     if (micState === true) {
       console.log("micState is ture, stop recognize");
       recognizerRef.current.stopContinuousRecognitionAsync();
@@ -111,16 +111,20 @@ export default React.memo(function TextInput({ handleSendMessage }: any) {
       color="default"
       sx={{ top: "auto", bottom: 0, display: "flex" }}
     >
-      <Toolbar variant="dense" sx={{ flexGrow: 1, gap: 1 }}>
-        <div
+      <Toolbar variant="dense" sx={{ flexGrow: 1, gap: 1, p: 1 }}>
+        <Typography
           className="ipt"
+          sx={{
+            alignSelf: "stretch",
+          }}
+          variant="body2"
           contentEditable={true}
           ref={(ref) => (inputAreaRef.current = ref)}
           onPasteCapture={onPaste}
           onKeyDownCapture={onKeyDown}
           onFocusCapture={() => setFocusState(true)}
           onBlurCapture={() => setFocusState(false)}
-        ></div>
+        ></Typography>
         <Zoom
           in={!isFocus}
           timeout={transitionDuration}
@@ -148,7 +152,7 @@ export default React.memo(function TextInput({ handleSendMessage }: any) {
           variant="contained"
           endIcon={<SendIcon />}
           onClick={handleSubmit}
-          size="small"
+          size="medium"
         >
           Send
         </Button>

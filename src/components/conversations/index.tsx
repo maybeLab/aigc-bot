@@ -12,17 +12,27 @@ import AddIcon from "@mui/icons-material/Add";
 
 import AddDialog from "./add";
 
-import msgListContext, { EModifyType } from "@/context/messageList";
+import Store from "@/context";
 
-import { IConversation, getMessages } from "@/fetch/api";
+import { EModifyType, IConversation } from "@/types";
+import { getMessages } from "@/fetch/api";
 
 export default React.memo(function Conversations(props: {
   list: IConversation[];
   onAdd: (data: IConversation) => void;
 }) {
-  const { dispatch } = useContext(msgListContext);
+  const { state, dispatch } = useContext(Store);
 
   let { conversationId } = useParams();
+
+  React.useEffect(() => {
+    const currentBot = props.list.find(({ id }) => id === conversationId);
+    currentBot &&
+      dispatch({
+        type: EModifyType.SET_CONVERSATION,
+        payload: currentBot,
+      });
+  }, [props.list, conversationId, dispatch]);
   const [dialogVisible, setDialogStatus] = React.useState(false);
 
   const onCloseDialog = (data?: IConversation) => {

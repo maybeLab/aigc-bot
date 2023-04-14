@@ -12,7 +12,8 @@ import {
   Alert,
 } from "@mui/material";
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
-import { API_CREATE_CONVERSATION, IConversation } from "@/fetch/api";
+import { API_CREATE_CONVERSATION } from "@/fetch/api";
+import { IConversation } from "@/types";
 import { useSnackbar } from "notistack";
 
 export interface IForm {

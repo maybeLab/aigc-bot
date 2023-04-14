@@ -14,12 +14,11 @@ import Typography from "@mui/material/Typography";
 
 import Settings from "@/components/settings";
 import Conversations from "@/components/conversations";
-import { API_GET_CONVERSATIONS, IConversation } from "@/fetch/api";
-
+import { API_GET_CONVERSATIONS } from "@/fetch/api";
+import { IConversation } from "@/types";
 const drawerWidth = 240;
 
-interface Props {
-}
+interface Props {}
 
 export default function App(props: Props) {
   const [mobileOpen, setMobileOpen] = React.useState(false);

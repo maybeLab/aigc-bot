@@ -1,18 +1,16 @@
-import { TMessageRoles } from "@/context/messageList";
+import { TMessageRoles } from "@/types";
 
-import MsgItemMine from "../msgItemMine";
-import MsgItemBot from "../msgItemBot";
+import MsgItemMine from "./mine";
+import MsgItemBot from "./bot";
 
-function MsgItem(props: { type: TMessageRoles; content: string }) {
-  return (
-    <div>
-      {props.type === "user" ? (
-        <MsgItemMine content={props.content}></MsgItemMine>
-      ) : (
-        <MsgItemBot {...props}></MsgItemBot>
-      )}
-    </div>
-  );
+interface IProps {
+  type: TMessageRoles;
+  content: string;
 }
 
-export default MsgItem;
+export default function MsgItem(props: IProps) {
+  if (props.type === "user") {
+    return <MsgItemMine content={props.content}></MsgItemMine>;
+  }
+  return <MsgItemBot {...props}></MsgItemBot>;
+}

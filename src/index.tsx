@@ -10,7 +10,7 @@ import Chat from "@/components/chat";
 import reportWebVitals from "./reportWebVitals";
 import { getUserId } from "./fetch/api";
 import { SnackbarProvider } from "notistack";
-import { MsgListProvider } from "./context/messageList";
+import { StoreProvider } from "./context";
 
 const uid = await getUserId().catch((res) => alert(res.message));
 
@@ -36,11 +36,7 @@ const router = createBrowserRouter([
     children: [
       {
         path: "chat/:conversationId",
-        element: (
-          <MsgListProvider>
-            <Chat />
-          </MsgListProvider>
-        ),
+        element: <Chat />,
       },
     ],
   },
@@ -52,7 +48,9 @@ const root = ReactDOM.createRoot(
 root.render(
   // <React.StrictMode>
   <SnackbarProvider>
-    <RouterProvider router={router} />
+    <StoreProvider>
+      <RouterProvider router={router} />
+    </StoreProvider>
   </SnackbarProvider>
   // </React.StrictMode>
 );
