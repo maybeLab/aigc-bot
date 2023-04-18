@@ -20,7 +20,7 @@ export function stringAvatar(name: string) {
   if (!name) return {};
   const children = name.includes(" ")
     ? `${name.split(" ")[0][0]}${name.split(" ")[1][0]}`
-    : name.slice(0, 2);
+    : name.slice(0, 1);
   return {
     sx: {
       bgcolor: stringToColor(name),

@@ -39,12 +39,12 @@ const reducer: React.Reducer<TState, TAction> = function (
         ...state,
         conversation: action.payload,
       };
-    case EModifyType.MULTI_ADD_MESSAGE:
+    case EModifyType.MULTI_UNSHIFT_MESSAGE:
       return {
         ...state,
-        messages: state.messages.concat(action.payload),
+        messages: action.payload.concat(state.messages),
       };
-    case EModifyType.ADD_MESSAGE:
+    case EModifyType.PUSH_MESSAGE:
       return {
         ...state,
         messages: state.messages.concat([action.payload]),

@@ -10,7 +10,7 @@ function MsgItemMine(props: any) {
       <Typography variant="body2">{props.content}</Typography>
       <Avatar
         sx={{ marginLeft: 2 }}
-        src="https://mui.com/static/images/avatar/1.jpg"
+        src="https://xsgames.co/randomusers/assets/avatars/pixel/39.jpg"
       ></Avatar>
     </ListItem>
   );

@@ -15,7 +15,6 @@ import AddDialog from "./add";
 import Store from "@/context";
 
 import { EModifyType, IConversation } from "@/types";
-import { getMessages } from "@/fetch/api";
 
 export default React.memo(function Conversations(props: {
   list: IConversation[];

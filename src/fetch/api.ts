@@ -28,11 +28,8 @@ const getCommonHeaders = () => {
   });
 };
 
-export const getMessages = (payload: {
-  conversationId: string;
-  lastMessageId?: string;
-}) =>
-  fetch(`${ENDPOINT}/chat/message?${new URLSearchParams(payload).toString()}`, {
+export const getMessages = (query: string) =>
+  fetch(`${ENDPOINT}/chat/message?${query}`, {
     method: "GET",
     headers: getCommonHeaders(),
   }).then((response) => {
