@@ -16,10 +16,13 @@ import Store from "@/context";
 
 import { EModifyType, IConversation } from "@/types";
 
-export default React.memo(function Conversations(props: {
+interface IProps {
   list: IConversation[];
   onAdd: (data: IConversation) => void;
-}) {
+  onNav?: () => void;
+}
+
+export default React.memo(function Conversations(props: IProps) {
   const { state, dispatch } = useContext(Store);
 
   let { conversationId } = useParams();
@@ -43,6 +46,11 @@ export default React.memo(function Conversations(props: {
 
   const navgate = useNavigate();
 
+  const onClickConversation = (id: string) => {
+    navgate(`/chat/${id}`, { replace: true });
+    props.onNav?.();
+  };
+
   return (
     <>
       <Toolbar />
@@ -52,7 +60,7 @@ export default React.memo(function Conversations(props: {
           <ListItem key={item.id} disablePadding>
             <ListItemButton
               selected={conversationId === item.id}
-              onClick={() => navgate(`/chat/${item.id}`, { replace: true })}
+              onClick={() => onClickConversation(item.id)}
               title={conversationId}
             >
               <ListItemText primary={item.name} />

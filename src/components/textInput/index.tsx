@@ -1,4 +1,5 @@
 import React from "react";
+import Draggable from "./draggable";
 
 import { useTheme } from "@mui/material/styles";
 import Button from "@mui/material/Button";
@@ -7,7 +8,6 @@ import Toolbar from "@mui/material/Toolbar";
 import Fab from "@mui/material/Fab";
 import SendIcon from "@mui/icons-material/Send";
 import MicIcon from "@mui/icons-material/Mic";
-import Zoom from "@mui/material/Zoom";
 import Typography from "@mui/material/Typography";
 
 import * as SpeechSDK from "microsoft-cognitiveservices-speech-sdk";
@@ -15,15 +15,7 @@ import { getSpeechConfig } from "@/utils/speech";
 
 export default React.memo(function TextInput({ handleSendMessage }: any) {
   const inputAreaRef = React.useRef<HTMLSpanElement | null>();
-  const [tip, setTip] = React.useState("");
   const [text, setText] = React.useState("");
-  const [isFocus, setFocusState] = React.useState(false);
-
-  const theme = useTheme();
-  const transitionDuration = {
-    enter: theme.transitions.duration.enteringScreen,
-    exit: theme.transitions.duration.leavingScreen,
-  };
 
   const recognizerRef: any = React.useRef();
   const [micState, setMicState] = React.useState(false);
@@ -58,7 +50,6 @@ export default React.memo(function TextInput({ handleSendMessage }: any) {
         displayText =
           "ERROR: Speech was cancelled or could not be recognized. Ensure your microphone is working properly.";
         setMicState(false);
-        setTip("");
         alert(displayText);
       }
     });
@@ -122,16 +113,8 @@ export default React.memo(function TextInput({ handleSendMessage }: any) {
           ref={(ref) => (inputAreaRef.current = ref)}
           onPasteCapture={onPaste}
           onKeyDownCapture={onKeyDown}
-          onFocusCapture={() => setFocusState(true)}
-          onBlurCapture={() => setFocusState(false)}
         ></Typography>
-        <Zoom
-          in={!isFocus}
-          timeout={transitionDuration}
-          style={{
-            transitionDelay: `${isFocus ? 0 : transitionDuration.exit}ms`,
-          }}
-        >
+        <Draggable>
           <Fab
             aria-label="Microphone"
             color={micState ? "success" : "primary"}
@@ -146,7 +129,7 @@ export default React.memo(function TextInput({ handleSendMessage }: any) {
           >
             <MicIcon />
           </Fab>
-        </Zoom>
+        </Draggable>
 
         <Button
           variant="contained"

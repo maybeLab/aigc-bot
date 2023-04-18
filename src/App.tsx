@@ -96,7 +96,11 @@ export default function App(props: Props) {
             },
           }}
         >
-          <Conversations list={list} onAdd={onAddRobot} />
+          <Conversations
+            list={list}
+            onAdd={onAddRobot}
+            onNav={handleDrawerToggle}
+          />
         </Drawer>
         <Drawer
           variant="permanent"
