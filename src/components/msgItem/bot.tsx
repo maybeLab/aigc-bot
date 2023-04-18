@@ -1,4 +1,6 @@
 import React, { useEffect, memo } from "react";
+import formatter from "@/utils/formatter";
+
 import speak from "./tts";
 import ListItem from "@mui/material/ListItem";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
@@ -12,22 +14,29 @@ import Store from "@/context";
 
 function MsgItemBot(props: any) {
   const { state } = React.useContext(Store);
+  const [content, setContent] = React.useState("");
 
   const textToSpeech = (text: string) => {
     speak(text);
   };
 
   useEffect(() => {
-    props.startAutoSpeech === true && textToSpeech(props.content);
+    setContent(formatter(props.content));
   }, [props]);
 
   return (
-    <ListItem alignItems="center" sx={{ pr: 8 }}>
+    <ListItem alignItems="center">
       <ListItemAvatar sx={{ alignSelf: "flex-start" }}>
         <Avatar {...stringAvatar(state.conversation.name)}></Avatar>
       </ListItemAvatar>
 
-      <Typography variant="body2">
+      <Typography
+        variant="body2"
+        sx={{
+          whiteSpace: "pre-wrap",
+          width: "calc(100% - 56px - 32px - 16px)",
+        }}
+      >
         <IconButton
           color="secondary"
           aria-label="speak"
@@ -40,7 +49,10 @@ function MsgItemBot(props: any) {
         >
           <RecordVoiceOverIcon fontSize="inherit" />
         </IconButton>
-        {props.content}
+        <span
+          className="marked"
+          dangerouslySetInnerHTML={{ __html: content }}
+        ></span>
       </Typography>
     </ListItem>
   );

@@ -4,7 +4,9 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 import BrowserLogger from "alife-logger";
 import ProjectInfo from "../package.json";
-import "./index.css";
+import "./index.scss";
+import 'highlight.js/styles/github-dark.css';
+
 import App from "./App";
 import Chat from "@/components/chat";
 import reportWebVitals from "./reportWebVitals";
