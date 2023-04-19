@@ -1,6 +1,9 @@
 import * as DOMPurify from "dompurify";
 import { marked } from "marked";
 import hljs from "highlight.js/lib/common";
+import CopyButtonPlugin from "./highlightjs-copy";
+
+hljs.addPlugin(new CopyButtonPlugin());
 
 export function highlight(text: string, lang: string) {
   if (hljs.getLanguage(lang)) {
@@ -13,7 +16,7 @@ marked.setOptions({
   highlight: function (code, lang) {
     return highlight(code, lang);
   },
-  langPrefix: 'hljs language-',
+  langPrefix: "hljs-copy-wrapper hljs language-",
 });
 
 export default function formatter(text: string) {
