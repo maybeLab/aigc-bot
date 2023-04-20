@@ -8,4 +8,4 @@ declare interface Window {
   };
 }
 declare module 'alife-logger';
-declare module 'highlightjs-copy';
+declare module 'sillyname';
