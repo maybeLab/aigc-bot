@@ -1,5 +1,4 @@
-import React, { ReactElement, useReducer, useState } from "react";
-import type { Dispatch } from "react";
+import React, { ReactElement, useReducer } from "react";
 import { IMsgData, EModifyType, IConversation } from "@/types";
 
 export type TState = {
@@ -18,7 +17,7 @@ export interface TContextProps {
   dispatch: React.Dispatch<TAction>;
 }
 
-const initialState = {
+export const initialState = {
   conversation: {
     id: "",
     name: "",

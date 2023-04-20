@@ -54,7 +54,6 @@ export default function Messages(props: IProps) {
   }, [isLoading, data, state.messages, listRef]);
 
   React.useEffect(() => {
-    // console.log(data, error, isLoading, isValidating);
     if (data?.length && data?.slice(-1)[0].length) {
       dispatch({
         type: EModifyType.MULTI_UNSHIFT_MESSAGE,

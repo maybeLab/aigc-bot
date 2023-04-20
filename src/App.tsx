@@ -5,8 +5,10 @@ import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import CssBaseline from "@mui/material/CssBaseline";
 import Drawer from "@mui/material/Drawer";
+import Tooltip from "@mui/material/Tooltip";
 import IconButton from "@mui/material/IconButton";
 import SettingsIcon from "@mui/icons-material/Settings";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 
 import MenuIcon from "@mui/icons-material/Menu";
 import Toolbar from "@mui/material/Toolbar";
@@ -16,11 +18,15 @@ import Settings from "@/components/settings";
 import Conversations from "@/components/conversations";
 import { API_GET_CONVERSATIONS } from "@/fetch/api";
 import { IConversation } from "@/types";
+import Store from "@/context";
+
 const drawerWidth = 240;
 
 interface Props {}
 
 export default function App(props: Props) {
+  const { state } = React.useContext(Store);
+
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [settingOpen, setSettingOpen] = React.useState(false);
 
@@ -63,7 +69,18 @@ export default function App(props: Props) {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-            TIYA-BOT-DEMO
+            {state.conversation.name || ""}
+            {state.conversation.name && (
+              <Tooltip title={state.conversation.preset || "No Preset"}>
+                <IconButton
+                  aria-label="infomation"
+                  size="small"
+                  sx={{ ml: "2px" }}
+                >
+                  <InfoOutlinedIcon sx={{ color: "#fff", fontSize: 18 }} />
+                </IconButton>
+              </Tooltip>
+            )}
           </Typography>
           <IconButton
             color="inherit"
@@ -130,6 +147,7 @@ export default function App(props: Props) {
           flexGrow: 1,
           width: { sm: `calc(100% - ${drawerWidth}px)` },
           marginTop: 7,
+          position: "relative",
         }}
       >
         <Outlet />

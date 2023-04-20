@@ -1,17 +1,21 @@
 import React from "react";
-import Draggable from "./draggable";
 
 import { useTheme } from "@mui/material/styles";
-import Button from "@mui/material/Button";
+import { blue } from "@mui/material/colors";
+import { LoadingButton } from "@mui/lab";
+import { Button } from "@mui/material";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
-import Fab from "@mui/material/Fab";
-import SendIcon from "@mui/icons-material/Send";
-import MicIcon from "@mui/icons-material/Mic";
+import { Send, Mic, CloseOutlined } from "@mui/icons-material";
+
 import Typography from "@mui/material/Typography";
 
-import * as SpeechSDK from "microsoft-cognitiveservices-speech-sdk";
-import { getSpeechConfig } from "@/utils/speech";
+import {
+  SpeechSDK,
+  getSpeechConfig,
+  ResultReason,
+  AutoDetectSourceLanguageConfig,
+} from "@/utils/speech";
 
 export default React.memo(function TextInput({ handleSendMessage }: any) {
   const inputAreaRef = React.useRef<HTMLSpanElement | null>();
@@ -19,40 +23,45 @@ export default React.memo(function TextInput({ handleSendMessage }: any) {
 
   const recognizerRef: any = React.useRef();
   const [micState, setMicState] = React.useState(false);
+  const [micLoading, setMicLoading] = React.useState(false);
 
   const sttFromMic = React.useCallback(async () => {
-    if (micState === true) {
-      console.log("micState is ture, stop recognize");
-      recognizerRef.current.stopContinuousRecognitionAsync();
-      setMicState(false);
-      return;
-    }
-    const speechConfig = await getSpeechConfig();
-    speechConfig.speechRecognitionLanguage = window._GLOBAL_SETTINGS.locale;
-    const audioConfig = SpeechSDK.AudioConfig.fromMicrophoneInput();
-    const recognizer = new SpeechSDK.SpeechRecognizer(
-      speechConfig,
-      audioConfig
-    );
-    recognizerRef.current = recognizer;
-    setMicState(true);
-
-    // setTip(tipCont.speak[window._GLOBAL_SETTINGS.locale]);
-
-    recognizer.recognizeOnceAsync((result) => {
-      let displayText;
-      if (result.reason === SpeechSDK.ResultReason.RecognizedSpeech) {
-        displayText = result.text;
-        console.log("speech text:", displayText);
+    try {
+      if (micState === true) {
+        recognizerRef.current.stopContinuousRecognitionAsync();
         setMicState(false);
-        // wsSend({ type: 101, message: displayText });
-      } else {
-        displayText =
-          "ERROR: Speech was cancelled or could not be recognized. Ensure your microphone is working properly.";
-        setMicState(false);
-        alert(displayText);
+        return;
       }
-    });
+      setMicLoading(true);
+      const speechConfig = await getSpeechConfig();
+      const audioConfig = SpeechSDK.AudioConfig.fromMicrophoneInput();
+      const recognizer = SpeechSDK.SpeechRecognizer.FromConfig(
+        speechConfig,
+        AutoDetectSourceLanguageConfig.fromLanguages(["en-US", "zh-CN"]),
+        audioConfig
+      );
+      recognizerRef.current = recognizer;
+      setMicLoading(false);
+      setMicState(true);
+
+      recognizer.canceled = (_, event) => {
+        setMicState(false);
+      };
+
+      recognizer.recognized = (_, event) => {
+        if (event.result.reason !== ResultReason.NoMatch) {
+          (inputAreaRef.current as HTMLSpanElement).insertAdjacentText(
+            "beforeend",
+            event.result.text
+          );
+        }
+      };
+
+      recognizer.startContinuousRecognitionAsync();
+    } catch (error) {
+      setMicLoading(false);
+      setMicState(false);
+    }
   }, [micState]);
 
   const clearInputArea = React.useCallback((blur = false) => {
@@ -103,10 +112,24 @@ export default React.memo(function TextInput({ handleSendMessage }: any) {
       sx={{ top: "auto", bottom: 0, display: "flex" }}
     >
       <Toolbar variant="dense" sx={{ flexGrow: 1, gap: 1, p: 1 }}>
+        <LoadingButton
+          variant="outlined"
+          onClick={sttFromMic}
+          disabled={micLoading}
+          sx={{
+            width: "36px",
+            minWidth: 4,
+            borderRadius: "50%",
+          }}
+          loading={micLoading}
+        >
+          {micState ? <CloseOutlined /> : <Mic />}
+        </LoadingButton>
         <Typography
-          className="ipt"
+          className={`ipt ${micState && !micLoading ? "loading" : ""}`}
           sx={{
             alignSelf: "stretch",
+            borderColor: blue[500],
           }}
           variant="body2"
           contentEditable={true}
@@ -114,26 +137,10 @@ export default React.memo(function TextInput({ handleSendMessage }: any) {
           onPasteCapture={onPaste}
           onKeyDownCapture={onKeyDown}
         ></Typography>
-        <Draggable>
-          <Fab
-            aria-label="Microphone"
-            color={micState ? "success" : "primary"}
-            onClick={sttFromMic}
-            sx={{
-              position: "absolute",
-              top: -80,
-              left: 0,
-              right: 0,
-              margin: "auto",
-            }}
-          >
-            <MicIcon />
-          </Fab>
-        </Draggable>
 
         <Button
           variant="contained"
-          endIcon={<SendIcon />}
+          endIcon={<Send />}
           onClick={handleSubmit}
           size="medium"
         >

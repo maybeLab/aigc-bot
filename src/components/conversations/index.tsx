@@ -2,6 +2,7 @@ import React, { useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
 import Divider from "@mui/material/Divider";
+import Button from "@mui/material/Button";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
@@ -12,7 +13,7 @@ import AddIcon from "@mui/icons-material/Add";
 
 import AddDialog from "./add";
 
-import Store from "@/context";
+import Store, {initialState} from "@/context";
 
 import { EModifyType, IConversation } from "@/types";
 
@@ -28,13 +29,14 @@ export default React.memo(function Conversations(props: IProps) {
   let { conversationId } = useParams();
 
   React.useEffect(() => {
-    const currentBot = props.list.find(({ id }) => id === conversationId);
+    const currentBot = props.list.find(({ id }) => id === conversationId) || initialState.conversation;
     currentBot &&
       dispatch({
         type: EModifyType.SET_CONVERSATION,
         payload: currentBot,
       });
   }, [props.list, conversationId, dispatch]);
+  
   const [dialogVisible, setDialogStatus] = React.useState(false);
 
   const onCloseDialog = (data?: IConversation) => {
@@ -53,7 +55,16 @@ export default React.memo(function Conversations(props: IProps) {
 
   return (
     <>
-      <Toolbar />
+      <Toolbar>
+        <Button
+          disableRipple
+          size="large"
+          variant="text"
+          onClick={() => navgate("/", { replace: true })}
+        >
+          AIGC-BOT
+        </Button>
+      </Toolbar>
       <Divider />
       <List disablePadding>
         {props.list.map((item) => (

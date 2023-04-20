@@ -3,8 +3,12 @@ import {
   SpeechSynthesizer,
   ResultReason,
 } from "microsoft-cognitiveservices-speech-sdk";
+
 import { API_AZURE_TOKEN } from "../fetch/api";
 import { kvCaches, SPEAKER_KEY, ONE_MONTH } from "@/fetch/caches";
+
+export * as SpeechSDK from "microsoft-cognitiveservices-speech-sdk";
+export * from "microsoft-cognitiveservices-speech-sdk";
 
 const serviceRegion = "eastus";
 

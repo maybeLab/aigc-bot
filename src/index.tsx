@@ -8,6 +8,7 @@ import "./index.scss";
 import 'highlight.js/styles/github-dark.css';
 
 import App from "./App";
+import ChatStarter from "@/components/chat/starter";
 import Chat from "@/components/chat";
 import reportWebVitals from "./reportWebVitals";
 import { getUserId } from "./fetch/api";
@@ -36,6 +37,10 @@ const router = createBrowserRouter([
     path: "/",
     element: <App />,
     children: [
+      {
+        path: "/",
+        element: <ChatStarter />,
+      },
       {
         path: "chat/:conversationId",
         element: <Chat />,
