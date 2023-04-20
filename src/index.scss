@@ -31,7 +31,7 @@ code {
     line-height: 1.43;
     letter-spacing: 0.01071em;
   }
-  > p:first-child:not(:has(> *)) {
+  > p:first-child {
     display: inline;
     + * {
       margin-top: 16px;

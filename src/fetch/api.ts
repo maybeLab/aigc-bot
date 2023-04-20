@@ -1,6 +1,6 @@
 import { kvCaches, USER_ID_KEY, ONE_YEAR } from "./caches";
 import { IForm as IConversationForm } from "@/components/conversations/add";
-import { IConversation } from "@/types";
+import { IConversation, TPreviouslyContents } from "@/types";
 
 let userId = "";
 
@@ -44,6 +44,7 @@ export const getMessages = (query: string) =>
 export const API_ASK_AI = (payload: {
   conversationId: string;
   content: string;
+  previouslyContents?: TPreviouslyContents;
 }) =>
   fetch(`${ENDPOINT}/chat/message`, {
     method: "POST",

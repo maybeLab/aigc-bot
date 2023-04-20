@@ -22,3 +22,8 @@ export interface IConversation {
   preset: string;
   update_at: string;
 }
+
+export type TPreviouslyContents = {
+  role: TMessageRoles;
+  content: string;
+}[];

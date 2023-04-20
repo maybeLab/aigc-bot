@@ -14,6 +14,8 @@ import { EModifyType } from "@/types";
 
 import "./index.scss";
 
+const DEFAULT_PREVIOUSLY_CONTENTS_LENGTH = 4;
+
 function Main() {
   let { conversationId } = useParams();
   const msgListRef: any = useRef();
@@ -25,7 +27,12 @@ function Main() {
   const handleSendMessage = useCallback(
     (content: string, callback: () => void) => {
       if (!content || !conversationId) return;
-      API_ASK_AI({ content, conversationId })
+
+      const previouslyContents = state.messages
+        .slice(-DEFAULT_PREVIOUSLY_CONTENTS_LENGTH)
+        .map(({ content, role }) => ({ content, role }));
+
+      API_ASK_AI({ content, conversationId, previouslyContents })
         .then(async (res) => {
           const decoder = new TextDecoder("utf-8");
           if (!res.body) {
@@ -72,7 +79,7 @@ function Main() {
           });
         });
     },
-    [conversationId, dispatch, enqueueSnackbar]
+    [conversationId, dispatch, enqueueSnackbar, state.messages]
   );
 
   return (

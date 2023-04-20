@@ -20,6 +20,10 @@ function MsgItemBot(props: any) {
     speak(text);
   };
 
+  useEffect(() => {
+    setContent(formatter(props.content));
+  }, [props]);
+
   return (
     <ListItem alignItems="center">
       <ListItemAvatar sx={{ alignSelf: "flex-start" }}>
