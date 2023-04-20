@@ -7,6 +7,8 @@ let userId = "";
 const ENDPOINT =
   process.env.NODE_ENV === "development"
     ? `${window.location.protocol}//${window.location.hostname}:3000/api/v1`
+    : window.location.hostname.includes("company")
+    ? "http://larkbot.company.com/api/v1"
     : "https://larkbot.company.com/api/v1";
 
 export const API_AZURE_TOKEN = async (region: string) => {
