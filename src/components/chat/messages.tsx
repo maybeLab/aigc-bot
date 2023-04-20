@@ -42,11 +42,16 @@ export default function Messages(props: IProps) {
     });
 
   React.useEffect(() => {
-    if (data?.length === 1 && isLoading === false && state.messages.length) {
+    if (
+      data?.length === 1 &&
+      isLoading === false &&
+      state.messages.length &&
+      listRef.current
+    ) {
       // @ts-ignore
       listRef.current?.lastChild?.scrollIntoViewIfNeeded?.();
     }
-  }, [isLoading, data, state.messages]);
+  }, [isLoading, data, state.messages, listRef]);
 
   React.useEffect(() => {
     // console.log(data, error, isLoading, isValidating);
@@ -72,8 +77,8 @@ export default function Messages(props: IProps) {
       <List
         sx={{
           width: "100%",
-          height: "100%",
-          pb: 7,
+          height: "calc(100% - 54px)",
+          pb: 0,
           overflow: "auto",
           bgcolor: "background.paper",
         }}

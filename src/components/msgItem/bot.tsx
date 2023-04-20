@@ -14,15 +14,11 @@ import Store from "@/context";
 
 function MsgItemBot(props: any) {
   const { state } = React.useContext(Store);
-  const [content, setContent] = React.useState("");
+  const [content, setContent] = React.useState(formatter(props.content));
 
   const textToSpeech = (text: string) => {
     speak(text);
   };
-
-  useEffect(() => {
-    setContent(formatter(props.content));
-  }, [props]);
 
   return (
     <ListItem alignItems="center">
