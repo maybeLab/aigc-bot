@@ -1,8 +1,7 @@
-import { kvCaches, USER_ID_KEY, ONE_YEAR } from "./caches";
 import { IForm as IConversationForm } from "@/components/conversations/add";
 import { IConversation, TPreviouslyContents } from "@/types";
 
-let userId = "";
+export const USER_ID_KEY = window.location.origin + "/USER_ID";
 
 const ENDPOINT =
   process.env.NODE_ENV === "development"
@@ -25,17 +24,17 @@ export const API_AZURE_TOKEN = async (region: string) => {
     });
 };
 
-const getCommonHeaders = () => {
+const getCommonHeaders = async () => {
   return new Headers({
-    Authorization: userId,
+    Authorization: await getUserId(),
     "Content-Type": "application/json",
   });
 };
 
-export const getMessages = (query: string) =>
+export const getMessages = async (query: string) =>
   fetch(`${ENDPOINT}/chat/message?${query}`, {
     method: "GET",
-    headers: getCommonHeaders(),
+    headers: await getCommonHeaders(),
   }).then((response) => {
     if (response.ok) {
       return response.json();
@@ -45,24 +44,23 @@ export const getMessages = (query: string) =>
     );
   });
 
-export const API_ASK_AI = (payload: {
+export const API_ASK_AI = async (payload: {
   conversationId: string;
   content: string;
   previouslyContents?: TPreviouslyContents;
 }) =>
   fetch(`${ENDPOINT}/chat/message`, {
     method: "POST",
-    headers: getCommonHeaders(),
+    headers: await getCommonHeaders(),
     body: JSON.stringify(payload),
   }).then((res) => (res.ok ? res : Promise.reject(res)));
 
 export const getUserId = async () => {
-  if (await kvCaches.has(USER_ID_KEY)) {
-    return kvCaches.get(USER_ID_KEY).then((id: string) => (userId = id));
+  if (localStorage[USER_ID_KEY]) {
+    return localStorage[USER_ID_KEY];
   } else {
     const id = await API_CREATE_USER();
-    userId = id;
-    kvCaches.set(USER_ID_KEY, id, ONE_YEAR);
+    localStorage[USER_ID_KEY] = id;
   }
 };
 
@@ -80,7 +78,7 @@ export const API_CREATE_USER = async (): Promise<string> =>
 
 export const API_GET_CONVERSATIONS = async (): Promise<IConversation[]> =>
   fetch(`${ENDPOINT}/conversation`, {
-    headers: getCommonHeaders(),
+    headers: await getCommonHeaders(),
   }).then((response) => {
     if (response.ok) {
       return response.json();
@@ -96,7 +94,7 @@ export const API_CREATE_CONVERSATION = async (
   fetch(`${ENDPOINT}/conversation`, {
     method: "POST",
     body: JSON.stringify(data),
-    headers: getCommonHeaders(),
+    headers: await getCommonHeaders(),
   }).then((response) => {
     if (response.ok) {
       return response.json();
