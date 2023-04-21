@@ -6,7 +6,10 @@ export const formatEventMessage = (text: string) => {
     } else {
       throw new Error("Invalid message format");
     }
-  } catch (error) {
-    throw new Error("decode message error: " + text);
+  } catch (err) {
+    if (err instanceof Error) {
+      console.warn(err.message + text);
+    }
+    return { index: -1 };
   }
 };

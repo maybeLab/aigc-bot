@@ -63,7 +63,7 @@ function Main() {
                     type: EModifyType.PUSH_MESSAGE,
                     payload: message,
                   });
-                } else {
+                } else if (index !== -1) {
                   dispatch({
                     type: EModifyType.UPSERT_CONTENT_MESSAGE,
                     payload: message,
