@@ -1,6 +1,16 @@
 import KeyvCache from "keyv-cache";
 
-export const kvCaches = new KeyvCache({ namespace: "fe-tiya-bot" });
+const kvCaches_ = new KeyvCache({ namespace: "aigc-bot" });
+
+export const kvCaches = new Proxy(kvCaches_, {
+  get: (target, prop) => {
+    if (window.location.protocol.includes("https")) {
+      return Reflect.get(target, prop);
+    } else {
+      return ()=>{};
+    }
+  },
+});
 
 export const ONE_MONTH = 30 * 24 * 60 * 60 * 1e3;
 export const ONE_YEAR = 365 * 24 * 60 * 60 * 1e3;
