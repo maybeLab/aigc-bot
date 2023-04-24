@@ -1,5 +1,6 @@
 import React from "react";
 import useSWRInfinite from "swr/infinite";
+
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
@@ -42,6 +43,10 @@ export default function Messages(props: IProps) {
     });
 
   React.useEffect(() => {
+    mutate();
+  }, [conversationId, mutate]);
+
+  React.useEffect(() => {
     if (
       data?.length === 1 &&
       isLoading === false &&
@@ -54,10 +59,13 @@ export default function Messages(props: IProps) {
   }, [isLoading, data, state.messages, listRef]);
 
   React.useEffect(() => {
-    if (data?.length && data?.slice(-1)[0].length) {
+    if (data?.length) {
       dispatch({
-        type: EModifyType.MULTI_UNSHIFT_MESSAGE,
-        payload: data.slice(-1)[0],
+        type: EModifyType.SET_PAYLOAD,
+        payload: {
+          key: "messages",
+          value: data.flat().reverse(),
+        },
       });
     } else {
       dispatch({ type: EModifyType.CLEAR_MESSAGE, payload: null });
