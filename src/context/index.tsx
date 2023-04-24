@@ -33,6 +33,16 @@ const reducer: React.Reducer<TState, TAction> = function (
   action: { type: EModifyType; payload: any }
 ) {
   switch (action.type) {
+    case EModifyType.SET_PAYLOAD:
+      return {
+        ...state,
+        [action.payload.key]: action.payload.value,
+      };
+    case EModifyType.PUSH_CONVERSATION:
+      return {
+        ...state,
+        conversations: state.conversations.concat([action.payload]),
+      };
     case EModifyType.SET_CONVERSATION:
       return {
         ...state,

@@ -13,7 +13,7 @@ import AddIcon from "@mui/icons-material/Add";
 
 import AddDialog from "./add";
 
-import Store, {initialState} from "@/context";
+import Store, { initialState } from "@/context";
 
 import { EModifyType, IConversation } from "@/types";
 
@@ -29,14 +29,16 @@ export default React.memo(function Conversations(props: IProps) {
   let { conversationId } = useParams();
 
   React.useEffect(() => {
-    const currentBot = props.list.find(({ id }) => id === conversationId) || initialState.conversation;
+    const currentBot =
+      props.list.find(({ id }) => id === conversationId) ||
+      initialState.conversation;
     currentBot &&
       dispatch({
         type: EModifyType.SET_CONVERSATION,
         payload: currentBot,
       });
   }, [props.list, conversationId, dispatch]);
-  
+
   const [dialogVisible, setDialogStatus] = React.useState(false);
 
   const onCloseDialog = (data?: IConversation) => {
@@ -48,8 +50,8 @@ export default React.memo(function Conversations(props: IProps) {
 
   const navgate = useNavigate();
 
-  const onClickConversation = (id: string) => {
-    navgate(`/chat/${id}`, { replace: true });
+  const onNavgate = (path: string) => {
+    navgate(path, { replace: true });
     props.onNav?.();
   };
 
@@ -60,7 +62,7 @@ export default React.memo(function Conversations(props: IProps) {
           disableRipple
           size="large"
           variant="text"
-          onClick={() => navgate("/", { replace: true })}
+          onClick={() => onNavgate(`/`)}
         >
           AIGC-BOT
         </Button>
@@ -71,7 +73,7 @@ export default React.memo(function Conversations(props: IProps) {
           <ListItem key={item.id} disablePadding>
             <ListItemButton
               selected={conversationId === item.id}
-              onClick={() => onClickConversation(item.id)}
+              onClick={() => onNavgate(`/chat/${item.id}`)}
               title={conversationId}
             >
               <ListItemText primary={item.name} />

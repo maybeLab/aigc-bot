@@ -1,23 +1,26 @@
 import * as React from "react";
 import { Outlet } from "react-router-dom";
 
-import AppBar from "@mui/material/AppBar";
-import Box from "@mui/material/Box";
-import CssBaseline from "@mui/material/CssBaseline";
-import Drawer from "@mui/material/Drawer";
-import Tooltip from "@mui/material/Tooltip";
-import IconButton from "@mui/material/IconButton";
+import {
+  AppBar,
+  ClickAwayListener,
+  Box,
+  CssBaseline,
+  Drawer,
+  Tooltip,
+  IconButton,
+  Toolbar,
+  Typography,
+} from "@mui/material";
+
 import SettingsIcon from "@mui/icons-material/Settings";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-
 import MenuIcon from "@mui/icons-material/Menu";
-import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
 
 import Settings from "@/components/settings";
 import Conversations from "@/components/conversations";
 import { API_GET_CONVERSATIONS } from "@/fetch/api";
-import { IConversation } from "@/types";
+import { IConversation, EModifyType } from "@/types";
 import Store from "@/context";
 
 const drawerWidth = 240;
@@ -25,21 +28,38 @@ const drawerWidth = 240;
 interface Props {}
 
 export default function App(props: Props) {
-  const { state } = React.useContext(Store);
+  const { state, dispatch } = React.useContext(Store);
+
+  const [open, setOpen] = React.useState(false);
+
+  const toggleTooltip = (status: boolean) => {
+    setOpen(status);
+  };
 
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [settingOpen, setSettingOpen] = React.useState(false);
 
-  const [list, setList] = React.useState([] as IConversation[]);
   React.useEffect(() => {
     API_GET_CONVERSATIONS().then((list) => {
-      setList(list);
+      dispatch({
+        type: EModifyType.SET_PAYLOAD,
+        payload: {
+          key: "conversations",
+          value: list,
+        },
+      });
     });
-  }, []);
+  }, [dispatch]);
 
-  const onAddRobot = React.useCallback((data: IConversation) => {
-    setList((prev) => [...prev, data]);
-  }, []);
+  const onAddRobot = React.useCallback(
+    (data: IConversation) => {
+      dispatch({
+        type: EModifyType.PUSH_CONVERSATION,
+        payload: data,
+      });
+    },
+    [dispatch]
+  );
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -71,15 +91,28 @@ export default function App(props: Props) {
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
             {state.conversation.name || ""}
             {state.conversation.name && (
-              <Tooltip title={state.conversation.preset || "No Preset"}>
-                <IconButton
-                  aria-label="infomation"
-                  size="small"
-                  sx={{ ml: "2px" }}
+              <ClickAwayListener onClickAway={() => toggleTooltip(false)}>
+                <Tooltip
+                  onClose={() => toggleTooltip(false)}
+                  open={open}
+                  disableFocusListener
+                  disableHoverListener
+                  disableTouchListener
+                  title={state.conversation.preset || "No Preset"}
+                  sx={{ color: "red" }}
                 >
-                  <InfoOutlinedIcon sx={{ color: "#fff", fontSize: 18 }} />
-                </IconButton>
-              </Tooltip>
+                  <IconButton
+                    aria-label="infomation"
+                    size="small"
+                    sx={{ ml: "2px" }}
+                  >
+                    <InfoOutlinedIcon
+                      onClick={() => toggleTooltip(true)}
+                      sx={{ color: "#fff", fontSize: 18 }}
+                    />
+                  </IconButton>
+                </Tooltip>
+              </ClickAwayListener>
             )}
           </Typography>
           <IconButton
@@ -114,7 +147,7 @@ export default function App(props: Props) {
           }}
         >
           <Conversations
-            list={list}
+            list={state.conversations}
             onAdd={onAddRobot}
             onNav={handleDrawerToggle}
           />
@@ -130,7 +163,7 @@ export default function App(props: Props) {
           }}
           open
         >
-          <Conversations list={list} onAdd={onAddRobot} />
+          <Conversations list={state.conversations} onAdd={onAddRobot} />
         </Drawer>
         <Drawer
           open={settingOpen}

@@ -8,6 +8,8 @@ export interface IMsgData {
 }
 
 export enum EModifyType {
+  SET_PAYLOAD,
+  PUSH_CONVERSATION,
   UPSERT_CONTENT_MESSAGE,
   UPDATE_THE_LAST_MESSAGE,
   PUSH_MESSAGE,
