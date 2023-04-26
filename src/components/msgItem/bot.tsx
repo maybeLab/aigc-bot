@@ -1,5 +1,6 @@
 import React, { useEffect, memo } from "react";
 import formatter from "@/utils/formatter";
+import { useTheme } from "@mui/material/styles";
 
 import speak from "./tts";
 import ListItem from "@mui/material/ListItem";
@@ -15,6 +16,7 @@ import Store from "@/context";
 function MsgItemBot(props: any) {
   const { state } = React.useContext(Store);
   const [content, setContent] = React.useState(formatter(props.content));
+  const theme = useTheme();
 
   const textToSpeech = (text: string) => {
     speak(text);
@@ -27,7 +29,10 @@ function MsgItemBot(props: any) {
   return (
     <ListItem alignItems="center">
       <ListItemAvatar sx={{ alignSelf: "flex-start" }}>
-        <Avatar {...stringAvatar(state.conversation.name)}></Avatar>
+        <Avatar
+          {...stringAvatar(state.conversation.name)}
+          style={{ color: theme.palette.text.primary }}
+        ></Avatar>
       </ListItemAvatar>
 
       <Typography

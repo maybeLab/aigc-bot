@@ -1,7 +1,6 @@
 import React from "react";
 
 import { useTheme } from "@mui/material/styles";
-import { blue } from "@mui/material/colors";
 import { LoadingButton } from "@mui/lab";
 import { Button } from "@mui/material";
 import AppBar from "@mui/material/AppBar";
@@ -18,6 +17,7 @@ import {
 } from "@/utils/speech";
 
 export default React.memo(function TextInput({ handleSendMessage }: any) {
+  const theme = useTheme();
   const inputAreaRef = React.useRef<HTMLSpanElement | null>();
   const [text, setText] = React.useState("");
 
@@ -129,7 +129,8 @@ export default React.memo(function TextInput({ handleSendMessage }: any) {
           className={`ipt ${micState && !micLoading ? "loading" : ""}`}
           sx={{
             alignSelf: "stretch",
-            borderColor: blue[500],
+            borderColor: theme.palette.divider,
+            backgroundColor: theme.palette.background.paper,
           }}
           variant="body2"
           contentEditable={true}
