@@ -1,11 +1,13 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
+
 import { createHashRouter, RouterProvider } from "react-router-dom";
+import * as serviceWorkerRegistration from "./serviceWorkerRegistration";
 
 import BrowserLogger from "alife-logger";
 import ProjectInfo from "../package.json";
 import "./index.scss";
-import 'highlight.js/styles/github-dark.css';
+import "highlight.js/styles/github-dark.css";
 
 import App from "./App";
 import ChatStarter from "@/components/chat/starter";
@@ -52,15 +54,16 @@ const router = createHashRouter([
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
+
 root.render(
-  // <React.StrictMode>
   <SnackbarProvider>
     <StoreProvider>
       <RouterProvider router={router} />
     </StoreProvider>
   </SnackbarProvider>
-  // </React.StrictMode>
 );
+
+serviceWorkerRegistration.register();
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))

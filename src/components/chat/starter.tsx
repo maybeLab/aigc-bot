@@ -5,6 +5,7 @@ import { useTheme } from "@mui/material/styles";
 import { Box, Typography, Button } from "@mui/material";
 import { blueGrey } from "@mui/material/colors";
 import Store from "@/context";
+import { HundredPointsURL } from "@/utils";
 
 export default React.memo(function ChatStarter() {
   const navgate = useNavigate();
@@ -29,10 +30,11 @@ export default React.memo(function ChatStarter() {
       }}
     >
       <img
-        src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Smilies/Hundred%20Points.png"
+        src={HundredPointsURL}
         alt="Hundred Points"
         width="200"
         height="200"
+        crossOrigin="anonymous"
       />
       <Typography
         variant="body1"
