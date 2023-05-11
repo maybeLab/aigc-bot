@@ -31,7 +31,7 @@ export default function Messages(props: IProps) {
 
     // add cursor to API
     return new URLSearchParams({
-      lastMessageId: previousPageData[0].id,
+      lastMessageId: previousPageData.slice(-1)?.[0]?.id,
       conversationId: conversationId as string,
     }).toString();
   };
