@@ -31,6 +31,7 @@ function Main() {
       const previouslyContents = state.messages
         .slice(-DEFAULT_PREVIOUSLY_CONTENTS_LENGTH)
         .map(({ content, role }) => ({ content, role }));
+      callback();
 
       API_ASK_AI({ content, conversationId, previouslyContents })
         .then(async (res) => {
@@ -38,7 +39,6 @@ function Main() {
           if (!res.body) {
             throw new Error("no body");
           }
-          callback();
           const reader = res.body.getReader();
 
           const generator = {
