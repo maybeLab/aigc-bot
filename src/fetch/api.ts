@@ -26,7 +26,11 @@ export const API_AZURE_TOKEN = async (region: string) => {
 
 const getCommonHeaders = async () => {
   return new Headers({
-    Authorization: await getUserId(),
+    "x-csrf-token": document.cookie
+      .split(";")
+      .map((e) => e.trim())
+      .filter((e) => e.includes("csrfToken="))[0]
+      ?.split("csrfToken=")[1],
     "Content-Type": "application/json",
   });
 };
@@ -35,6 +39,7 @@ export const getMessages = async (query: string) =>
   fetch(`${ENDPOINT}/chat/message?${query}`, {
     method: "GET",
     headers: await getCommonHeaders(),
+    credentials: "include",
   }).then((response) => {
     if (response.ok) {
       return response.json();
@@ -53,6 +58,7 @@ export const API_ASK_AI = async (payload: {
     method: "POST",
     headers: await getCommonHeaders(),
     body: JSON.stringify(payload),
+    credentials: "include",
   }).then((res) => (res.ok ? res : Promise.reject(res)));
 
 export const getUserId = async () => {
@@ -65,7 +71,11 @@ export const getUserId = async () => {
 };
 
 export const API_CREATE_USER = async (): Promise<string> =>
-  fetch(`${ENDPOINT}/user`, { method: "POST" })
+  fetch(`${ENDPOINT}/user`, {
+    method: "POST",
+    headers: await getCommonHeaders(),
+    credentials: "include",
+  })
     .then((response) => {
       if (response.ok) {
         return response.json();
@@ -79,6 +89,7 @@ export const API_CREATE_USER = async (): Promise<string> =>
 export const API_GET_CONVERSATIONS = async (): Promise<IConversation[]> =>
   fetch(`${ENDPOINT}/conversation`, {
     headers: await getCommonHeaders(),
+    credentials: "include",
   }).then((response) => {
     if (response.ok) {
       return response.json();
@@ -95,6 +106,7 @@ export const API_CREATE_CONVERSATION = async (
     method: "POST",
     body: JSON.stringify(data),
     headers: await getCommonHeaders(),
+    credentials: "include",
   }).then((response) => {
     if (response.ok) {
       return response.json();
