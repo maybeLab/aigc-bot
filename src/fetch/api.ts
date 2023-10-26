@@ -15,7 +15,11 @@ const redirectCatch = (err: Error) => {
 };
 
 export const API_AZURE_TOKEN = async (region: string) => {
-  return (await fetch(`${ENDPOINT}/azure/getAzureSpeechToken?region=${region}`))
+  return (
+    await fetch(`${ENDPOINT}/azure/getAzureSpeechToken?region=${region}`, {
+      credentials: "include",
+    })
+  )
     .json()
     .then((res) => {
       return res.token;
@@ -36,7 +40,6 @@ const getCommonHeaders = async () => {
 export const getMessages = async (query: string) =>
   fetch(`${ENDPOINT}/aigc/chat/message?${query}`, {
     method: "GET",
-    headers: await getCommonHeaders(),
     credentials: "include",
     redirect: "error",
   })
@@ -80,7 +83,6 @@ export const API_CREATE_USER = async (): Promise<void> =>
 
 export const API_GET_CONVERSATIONS = async (): Promise<IConversation[]> =>
   fetch(`${ENDPOINT}/aigc/conversation`, {
-    headers: await getCommonHeaders(),
     credentials: "include",
   })
     .then((response) => {
