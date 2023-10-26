@@ -36,43 +36,52 @@ const getCommonHeaders = async () => {
 };
 
 export const getMessages = async (query: string) =>
-  fetch(`${ENDPOINT}/chat/message?${query}`, {
+  fetch(`${ENDPOINT}/aigc/chat/message?${query}`, {
     method: "GET",
     headers: await getCommonHeaders(),
     credentials: "include",
-  }).then((response) => {
+    redirect: "error",
+  })
+    .then((response) => {
     if (response.ok) {
       return response.json();
     }
     throw new Error(
       `${response.url}\n${response.status}: ${response.statusText}`
     );
-  });
+    })
+    .catch(redirectCatch);
 
 export const API_ASK_AI = async (payload: {
   conversationId: string;
   content: string;
   previouslyContents?: TPreviouslyContents;
 }) =>
-  fetch(`${ENDPOINT}/chat/message`, {
+  fetch(`${ENDPOINT}/aigc/chat/message`, {
     method: "POST",
     headers: await getCommonHeaders(),
     body: JSON.stringify(payload),
     credentials: "include",
-  }).then((res) => (res.ok ? res : Promise.reject(res)));
+  })
+    .then((res) => (res.ok ? res : Promise.reject(res)))
+    .catch(redirectCatch);
 
-export const getUserId = async () => {
-  if (localStorage[USER_ID_KEY]) {
-    return localStorage[USER_ID_KEY];
-  } else {
-    const id = await API_CREATE_USER();
-    localStorage[USER_ID_KEY] = id;
-  }
-};
-
-export const API_CREATE_USER = async (): Promise<string> =>
-  fetch(`${ENDPOINT}/user`, {
+export const API_CREATE_USER = async (): Promise<void> =>
+  fetch(`${ENDPOINT}/aigc/user`, {
     method: "POST",
+    headers: await getCommonHeaders(),
+    credentials: "include",
+  }).then((response) => {
+    if (response.ok) {
+      return window.location.reload();
+    }
+    throw new Error(
+      `${response.url}\n${response.status}: ${response.statusText}`
+    );
+  });
+
+export const API_GET_CONVERSATIONS = async (): Promise<IConversation[]> =>
+  fetch(`${ENDPOINT}/aigc/conversation`, {
     headers: await getCommonHeaders(),
     credentials: "include",
   })
@@ -84,37 +93,26 @@ export const API_CREATE_USER = async (): Promise<string> =>
         `${response.url}\n${response.status}: ${response.statusText}`
       );
     })
-    .then((res) => res.id);
-
-export const API_GET_CONVERSATIONS = async (): Promise<IConversation[]> =>
-  fetch(`${ENDPOINT}/conversation`, {
-    headers: await getCommonHeaders(),
-    credentials: "include",
-  }).then((response) => {
-    if (response.ok) {
-      return response.json();
-    }
-    throw new Error(
-      `${response.url}\n${response.status}: ${response.statusText}`
-    );
-  });
+    .catch(redirectCatch);
 
 export const API_CREATE_CONVERSATION = async (
   data: IConversationForm
 ): Promise<IConversation> =>
-  fetch(`${ENDPOINT}/conversation`, {
+  fetch(`${ENDPOINT}/aigc/conversation`, {
     method: "POST",
     body: JSON.stringify(data),
     headers: await getCommonHeaders(),
     credentials: "include",
-  }).then((response) => {
+  })
+    .then((response) => {
     if (response.ok) {
       return response.json();
     }
     throw new Error(
       `${response.url}\n${response.status}: ${response.statusText}`
     );
-  });
+    })
+    .catch(redirectCatch);
 
 export async function askAI(
   { content, conversationId }: { content: string; conversationId: string },
