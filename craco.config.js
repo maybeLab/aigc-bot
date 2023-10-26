@@ -14,7 +14,7 @@ module.exports = {
         })
       );
       if (env === "production") {
-        webpackConfig.output.publicPath = "./";
+        webpackConfig.output.publicPath = process.env.PUBLIC_URL
       }
       return webpackConfig;
     },
