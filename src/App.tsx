@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 
@@ -47,6 +47,7 @@ export default function App(props: Props) {
 
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [settingOpen, setSettingOpen] = React.useState(false);
+  const navigate = useNavigate();
 
   React.useEffect(() => {
     API_GET_CONVERSATIONS().then((list) => {
@@ -66,8 +67,9 @@ export default function App(props: Props) {
         type: EModifyType.PUSH_CONVERSATION,
         payload: data,
       });
+      navigate(`/chat/${data.id}`, { replace: true });
     },
-    [dispatch]
+    [dispatch, navigate]
   );
 
   const handleDrawerToggle = () => {
