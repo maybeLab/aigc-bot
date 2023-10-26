@@ -1,23 +1,21 @@
 import { IForm as IConversationForm } from "@/components/conversations/add";
 import { IConversation, TPreviouslyContents } from "@/types";
 
-export const USER_ID_KEY = window.location.origin + "/USER_ID";
+const ENDPOINT = `${process.env.REACT_APP_MAIN_DOMAIN}/apis`;
+const AUTH_ENDPOINT = `${process.env.REACT_APP_MAIN_DOMAIN}/auth`;
 
-const ENDPOINT =
-  process.env.NODE_ENV === "development"
-    ? `${window.location.protocol}//${window.location.hostname}:3000/api/v1`
-    : window.location.hostname.includes("company")
-    ? `${window.location.protocol}//larkbot.company.com/api/v1`
-    : window.location.hostname.includes("out.company")
-    ? `/api/v1`
-    : "https://larkbot.company.com/api/v1";
+const redirectCatch = (err: Error) => {
+  if (err.message.includes("401")) {
+    return API_CREATE_USER().catch(() =>
+      window.location.assign(
+        `${AUTH_ENDPOINT}/login?redirect=${window.location.href}`
+      )
+    );
+  }
+};
 
 export const API_AZURE_TOKEN = async (region: string) => {
-  return (
-    await fetch(
-      `https://fetoolsout.company.com/office/getAzureSpeechToken?region=${region}`
-    )
-  )
+  return (await fetch(`${ENDPOINT}/azure/getAzureSpeechToken?region=${region}`))
     .json()
     .then((res) => {
       return res.token;
@@ -43,12 +41,12 @@ export const getMessages = async (query: string) =>
     redirect: "error",
   })
     .then((response) => {
-    if (response.ok) {
-      return response.json();
-    }
-    throw new Error(
-      `${response.url}\n${response.status}: ${response.statusText}`
-    );
+      if (response.ok) {
+        return response.json();
+      }
+      throw new Error(
+        `${response.url}\n${response.status}: ${response.statusText}`
+      );
     })
     .catch(redirectCatch);
 
@@ -105,12 +103,12 @@ export const API_CREATE_CONVERSATION = async (
     credentials: "include",
   })
     .then((response) => {
-    if (response.ok) {
-      return response.json();
-    }
-    throw new Error(
-      `${response.url}\n${response.status}: ${response.statusText}`
-    );
+      if (response.ok) {
+        return response.json();
+      }
+      throw new Error(
+        `${response.url}\n${response.status}: ${response.statusText}`
+      );
     })
     .catch(redirectCatch);
 

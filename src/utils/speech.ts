@@ -10,7 +10,7 @@ import { kvCaches, SPEAKER_KEY, ONE_MONTH } from "@/fetch/caches";
 export * as SpeechSDK from "microsoft-cognitiveservices-speech-sdk";
 export * from "microsoft-cognitiveservices-speech-sdk";
 
-const serviceRegion = "eastus";
+const serviceRegion = "southeastasia";
 
 export const transformAzureObject: any = (object: any) => {
   if (typeof object !== "object") return object;

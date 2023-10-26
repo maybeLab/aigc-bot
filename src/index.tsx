@@ -13,25 +13,17 @@ import App from "./App";
 import ChatStarter from "@/components/chat/starter";
 import Chat from "@/components/chat";
 import reportWebVitals from "./reportWebVitals";
-import { getUserId } from "./fetch/api";
 import { SnackbarProvider } from "notistack";
 import { StoreProvider } from "./context";
 
-const uid = await getUserId().catch((res) => alert(res.message));
+import Aegis from "aegis-web-sdk";
 
-BrowserLogger.singleton({
-  pid: "hz2jf4nhry@85c18f8c99e84dd",
-  uid: uid,
-  useFmp: true,
-  appType: "web",
-  imgUrl: "https://retcode-us-west-1.arms.aliyuncs.com/r.png?",
-  sendResource: true,
-  behavior: true,
-  enableConsole: process.env.NODE_ENV === "production",
-  release: ProjectInfo.version,
-  disabled: !(
-    process.env.NODE_ENV !== "development" || process.env.REACT_APP_ENABLED_ARMS
-  ),
+const aegis = new Aegis({
+  id: "EPqpQHr2VkxR8ZVQYb", // 上报 id
+  reportApiSpeed: true, // 接口测速
+  reportAssetSpeed: true, // 静态资源测速
+  spa: true, // spa 应用页面跳转的时候开启 pv 计算
+  hostUrl: "https://rumt-zh.com",
 });
 
 const router = createHashRouter([
