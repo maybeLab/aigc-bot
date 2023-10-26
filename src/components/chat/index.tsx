@@ -36,7 +36,7 @@ function Main() {
       API_ASK_AI({ content, conversationId, previouslyContents })
         .then(async (res) => {
           const decoder = new TextDecoder("utf-8");
-          if (!res.body) {
+          if (!res?.body) {
             throw new Error("no body");
           }
           const reader = res.body.getReader();
